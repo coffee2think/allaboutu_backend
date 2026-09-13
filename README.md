@@ -9,8 +9,8 @@
 ![Spring Security](https://img.shields.io/badge/Spring%20Security-6DB33F?logo=springsecurity&logoColor=white)
 ![JWT](https://img.shields.io/badge/JWT-000000?logo=jsonwebtokens&logoColor=white)
 
-> 🔗 Backend 레포 👉 [allaboutu_springboot](https://github.com/minji0478/allaboutu_springboot)
-> <br/> 🔗 Frontend 레포 👉 [allaboutu_vue](https://github.com/SUNGHWONJEON/allaboutu_vue)
+> 🔗 팀플 Backend 레포 👉 [allaboutu_springboot](https://github.com/minji0478/allaboutu_springboot)
+> <br/> 🔗 팀플 Frontend 레포 👉 [allaboutu_vue](https://github.com/SUNGHWONJEON/allaboutu_vue)
 
 **AllAboutU**는 사용자의 얼굴 및 이미지 정보를 활용하여 퍼스널컬러와 체형을 분석하고,  
 분석 결과를 바탕으로 코디와 스타일을 추천하는 뷰티·패션 서비스입니다.
@@ -308,13 +308,3 @@ cd allaboutu_vue
 npm install
 npm run serve
 ```
-
----
-
-## 📎 Repository
-
-- **Backend**  
-  https://github.com/coffee2think/allaboutu_springboot
-
-- **Frontend**  
-  https://github.com/coffee2think/allaboutu_vue
