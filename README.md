@@ -12,6 +12,8 @@
 > 🔗 팀플 Backend 레포 👉 [allaboutu_springboot](https://github.com/minji0478/allaboutu_springboot)
 > <br/> 🔗 팀플 Frontend 레포 👉 [allaboutu_vue](https://github.com/SUNGHWONJEON/allaboutu_vue)
 
+<img width="1672" height="941" alt="allaboutu-springboot_github_readme_intro_image" src="https://github.com/user-attachments/assets/8b4c4507-5396-42f6-85de-0cb4022e4dfc" />
+
 **AllAboutU**는 사용자의 얼굴 및 이미지 정보를 활용하여 퍼스널컬러와 체형을 분석하고,  
 분석 결과를 바탕으로 코디와 스타일을 추천하는 뷰티·패션 서비스입니다.
 
