@@ -35,3 +35,19 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Local secrets / configuration ###
+.env
+.env.*
+!.env.example
+
+src/main/resources/application-local.properties
+src/main/resources/application-secret.properties
+
+### Runtime / user uploaded files ###
+src/main/resources/**/board_upload/
+src/main/resources/**/cody_upload/
+src/main/resources/**/face_upload/
+src/main/resources/**/user_profile/
+src/main/resources/**/website_pics/
+src/main/resources/**/faceLoginInput/
