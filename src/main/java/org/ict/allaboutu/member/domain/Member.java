@@ -1,9 +1,6 @@
 package org.ict.allaboutu.member.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Pattern;
@@ -22,6 +19,8 @@ import java.time.LocalDateTime;
 @Table(name = "user_member")
 public class Member {
     @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "member_sequence_generator")
+    @SequenceGenerator(name = "member_sequence_generator", sequenceName = "USER_MEMBER_SEQ", allocationSize = 1)
     @Column(name = "USER_NUM")
     private Long userNum;
 

@@ -9,6 +9,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @RequiredArgsConstructor
 public class AccessService {
@@ -31,7 +33,10 @@ public class AccessService {
         }
 
         // 게시글 작성자와 현재 사용자가 일치하는지 확인
-        return currentUserId.equals(boardDto.getWriter().getUserId());
+        return Objects.equals(
+                currentUserId,
+                boardDto.getWriter().getUserId()
+        );
     }
 
     public boolean isLikeOwner(Authentication authentication, Long boardNum, String userId) throws Exception {
@@ -48,7 +53,10 @@ public class AccessService {
         }
 
         // 좋아요를 누른 사용자와 현재 사용자가 일치하는지 확인
-        return currentUserNum.equals(isLiked.getId().getUserNum());
+        return Objects.equals(
+                currentUserNum,
+                isLiked.getId().getUserNum()
+        );
     }
 
     public boolean isCommentAuthor(Authentication authentication, Long boardNum, Long commentNum) throws Exception {
@@ -65,7 +73,10 @@ public class AccessService {
         }
 
         // 댓글 작성자와 현재 사용자가 일치하는지 확인
-        return currentUserId.equals(commentDto.getWriter().getUserId());
+        return Objects.equals(
+                currentUserId,
+                commentDto.getWriter().getUserId()
+        );
     }
 
 }

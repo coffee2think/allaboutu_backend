@@ -8,10 +8,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;  // HttpMethod를 임포트 추가
 import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
@@ -36,23 +39,27 @@ public class SecurityConfig {
         List<String> adminOnlyList = List.of("/reports/{reportNum}", "/reports/**", "/admin/get");
 
         http
-                .csrf(csrf -> csrf.disable())
-                .authorizeRequests(authorizeRequests ->
-                        authorizeRequests
+                .cors(Customizer.withDefaults())
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(authorize ->
+                        authorize
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/boards/rank").permitAll()
                                 .requestMatchers(HttpMethod.GET, "/boards/{boardNum}", "/boards/{boardNum}/likes/{userId}", "/boards/{boardNum}/comments").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/boards", "/boards/{boardNum}/reports", "/boards/{boardNum}/likes", "/boards/{boardNum}/comments").authenticated()
                                 .requestMatchers(HttpMethod.POST, "/notices").hasAuthority(UserRole.ADMIN.name())
                                 .requestMatchers(HttpMethod.DELETE, "/notices/{noticeNum}").hasAuthority(UserRole.ADMIN.name())
-                                .requestMatchers(HttpMethod.DELETE, "/boards/{boardNum}").access("@accessService.isBoardAuthor(authentication, #boardNum)")
-                                .requestMatchers(HttpMethod.DELETE, "/boards/{boardNum}/likes/{userId}").access("accessService.isLikeOwner(authentication, #boardNum, #userId)")
-                                .requestMatchers(HttpMethod.DELETE, "/boards/{boardNum}/comments/{commentNum}").access("@accessService.isCommentAuthor(authentication, #boardNum, #commentNum)")
-                                .requestMatchers(HttpMethod.PATCH, "/boards/{boardNum}").access("@accessService.isBoardAuthor(authentication, #boardNum)")
-                                .requestMatchers(HttpMethod.PATCH, "/boards/{boardNum}/comments/{commentNum}").access("@accessService.isCommentAuthor(authentication, #boardNum, #commentNum)")
+                                .requestMatchers(HttpMethod.DELETE, "/boards/{boardNum}").access(new WebExpressionAuthorizationManager("@accessService.isBoardAuthor(authentication, #boardNum)"))
+                                .requestMatchers(HttpMethod.DELETE, "/boards/{boardNum}/likes/{userId}").access(new WebExpressionAuthorizationManager("@accessService.isLikeOwner(authentication, #boardNum, #userId)"))
+                                .requestMatchers(HttpMethod.DELETE, "/boards/{boardNum}/comments/{commentNum}").access(new WebExpressionAuthorizationManager("@accessService.isCommentAuthor(authentication, #boardNum, #commentNum)"))
+                                .requestMatchers(HttpMethod.PATCH, "/boards/{boardNum}").access(new WebExpressionAuthorizationManager("@accessService.isBoardAuthor(authentication, #boardNum)"))
+                                .requestMatchers(HttpMethod.PATCH, "/boards/{boardNum}/comments/{commentNum}").access(new WebExpressionAuthorizationManager("@accessService.isCommentAuthor(authentication, #boardNum, #commentNum)"))
                                 .requestMatchers(HttpMethod.PATCH, "/notices/{noticeNum}").hasAuthority(UserRole.ADMIN.name())
                                 .requestMatchers(anyList.toArray(new String[0])).permitAll()
                                 .requestMatchers(userOnlyList.toArray(new String[0])).hasAnyAuthority(UserRole.USER.name())
                                 .requestMatchers(adminOnlyList.toArray(new String[0])).hasAuthority(UserRole.ADMIN.name())
+                                .anyRequest()
+                                .authenticated()
                 )
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
