@@ -34,7 +34,6 @@ public class BoardController {
 
     // 게시글 목록 조회
     @GetMapping
-    @CrossOrigin(origins = "http://localhost:2222")
     public ResponseEntity<Page<BoardDto>> getBoardList(@PageableDefault(page = 0, size = 4) Pageable pageable) throws Exception {
         pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("boardNum").descending());
         Page<BoardDto> list = boardService.getBoardList(pageable);

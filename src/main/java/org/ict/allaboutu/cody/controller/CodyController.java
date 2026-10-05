@@ -29,7 +29,6 @@ public class CodyController {
     private final CodyService codyService;
 
     @GetMapping
-    @CrossOrigin(origins = "http://localhost:2222")
     public ResponseEntity<Page<CodyDto>> getCodyList(@PageableDefault(page = 0, size = 12) Pageable pageable,
                                                      @RequestParam("formNum") Long formNum,
                                                      @RequestParam("currentPage") int currentPage,
@@ -45,7 +44,6 @@ public class CodyController {
     }
 
     @GetMapping("/all")
-    @CrossOrigin(origins = "http://localhost:2222")
     public ResponseEntity<Page<CodyDto>> getCodyAllList(@PageableDefault(page = 0, size = 12) Pageable pageable,
                                                      @RequestParam("currentPage") int currentPage,
                                                      @RequestParam("pageSize") int pageSize) throws Exception {

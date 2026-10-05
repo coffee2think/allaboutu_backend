@@ -31,7 +31,7 @@ public class MemberService {
 
     public MemberDto signup(Member member) {
 
-        member.setUserNum(memberRepository.findMaxUserNum() + 1L);
+//        member.setUserNum(memberRepository.findMaxUserNum() + 1L); // 오라클 시퀀스 사용으로 제거
         member.setEnrollDate(LocalDateTime.now());
         member.setAccount("N");
         member.setReportCount(0L);
