@@ -72,10 +72,8 @@ public class BoardService {
     public BoardDto createBoard(BoardDto boardDto, List<String> hashtagList, List<MultipartFile> files) throws Exception {
 
         // Board 테이블 저장
-        Long maxBoardNum = boardRepository.findMaxBoardNum();
         Long userNum = memberRepository.findByUserId(boardDto.getWriter().getUserId()).getUserNum();
         Board board = Board.builder()
-                .boardNum(maxBoardNum == null ? 1 : maxBoardNum + 1)
                 .userNum(userNum)
                 .categoryNum(boardDto.getCategoryNum())
                 .boardTitle(boardDto.getBoardTitle())
@@ -99,7 +97,7 @@ public class BoardService {
                     hashtagRepository.save(boardHashtag);
                 }
 
-                BoardHashtagLink link = new BoardHashtagLink(new BoardHashtagLinkPK(board.getBoardNum(), boardHashtag.getHashtagNum()));
+                BoardHashtagLink link = new BoardHashtagLink(new BoardHashtagLinkPK(savedBoard.getBoardNum(), boardHashtag.getHashtagNum()));
                 boardHashtagLinkRepository.save(link);
 
                 boardHashtags.add(boardHashtag);
@@ -117,7 +115,7 @@ public class BoardService {
 
                     // 업로드 성공 시 DB 저장
                     Attachment attachment = Attachment.builder()
-                            .id(new AttachmentPK(board.getBoardNum(), Long.valueOf(idx)))
+                            .id(new AttachmentPK(savedBoard.getBoardNum(), Long.valueOf(idx)))
                             .originalFileName(file.getOriginalFilename())
                             .renameFileName(renameFileName)
                             .build();

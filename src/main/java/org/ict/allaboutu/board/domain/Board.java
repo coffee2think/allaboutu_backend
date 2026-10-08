@@ -1,9 +1,6 @@
 package org.ict.allaboutu.board.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -15,27 +12,37 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Entity
 @Builder
-@Table(name = "board")
+@Table(name = "BOARD")
 public class Board {
 
     @Id
-    @Column(name = "board_num")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "board_sequence_generator")
+    @SequenceGenerator(name = "board_sequence_generator", sequenceName = "BOARD_SEQ", allocationSize = 1)
+    @Column(name = "BOARD_NUM")
     private Long boardNum;
-    @Column(name = "user_num")
+
+    @Column(name = "USER_NUM")
     private Long userNum;
-    @Column(name = "category_num")
+
+    @Column(name = "CATEGORY_NUM")
     private Long categoryNum;
-    @Column(name = "board_title")
+
+    @Column(name = "BOARD_TITLE")
     private String boardTitle;
-    @Column(name = "board_content")
+
+    @Column(name = "BOARD_CONTENT")
     private String boardContent;
-    @Column(name = "create_date")
+
+    @Column(name = "CREATE_DATE")
     private LocalDateTime createDate;
-    @Column(name = "modify_date")
+
+    @Column(name = "MODIFY_DATE")
     private LocalDateTime modifyDate;
-    @Column(name = "delete_date")
+
+    @Column(name = "DELETE_DATE")
     private LocalDateTime deleteDate;
-    @Column(name = "read_count")
+
+    @Column(name = "READ_COUNT")
     private Long readCount;
 
 }

@@ -17,9 +17,6 @@ public interface BoardRepository extends JpaRepository<Board, Long> {
     @Query(value = "SELECT b FROM Board b WHERE b.deleteDate IS NULL ORDER BY b.boardNum DESC")
     Page<Board> findByDeleteDateIsNull(Pageable pageable);
 
-    @Query(value = "SELECT MAX(b.boardNum) FROM Board b")
-    Long findMaxBoardNum();
-
     @Query(value = "SELECT COUNT(l) FROM BoardLike l WHERE l.id.boardNum = :boardNum")
     Long countLikeByBoardNum(@Param("boardNum") Long boardNum);
 
