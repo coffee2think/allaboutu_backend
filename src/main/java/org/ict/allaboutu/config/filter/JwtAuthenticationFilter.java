@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.ict.allaboutu.member.domain.Member;
 import org.ict.allaboutu.config.repository.TokenRepository;
 import org.ict.allaboutu.config.service.JwtService;
@@ -28,46 +30,76 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
     private final TokenRepository tokenRepository;
     private final MemberRepository memberRepository;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
-
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String userEmail; // username
+
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
-        jwt = authHeader.substring(7);
-        userEmail = jwtService.extractUsername(jwt);// todo extract the userEmail from JWT token
-        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            // userDetailsService.loadUserByUsername 대신 memberRepository.findByUserId 사용
-            Member member = memberRepository.findByUserId(userEmail);
-            boolean isTokenValid = tokenRepository.findByToken(jwt)
-                    .map(t -> !t.isExpired() && !t.isRevoked()).orElse(false);
 
-            if (jwtService.isTokenValid(jwt, member) && isTokenValid) {
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(member, null, List.of(new SimpleGrantedAuthority(member.getRole().name())));
-                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+        final String jwt = authHeader.substring(7);
+
+        try {
+            // 만료된 JWT라면 ExpiredJwtException 발생시킴
+            String userId = jwtService.extractUsername(jwt);
+            Member member = memberRepository.findByUserId(userId);
+
+            boolean storedTokenValid = tokenRepository.findByToken(jwt)
+                    .map(token -> !token.isExpired() && !token.isRevoked())
+                    .orElse(false);
+
+            if (member == null
+                    || !storedTokenValid
+                    || !jwtService.isTokenValid(jwt, member)) {
+                unauthorized(response, "INVALID_TOKEN");
+                return;
             }
+
+            if (SecurityContextHolder.getContext().getAuthentication() == null) {
+                var authenticationToken = new UsernamePasswordAuthenticationToken(
+                        member,
+                        null,
+                        List.of(new SimpleGrantedAuthority(member.getRole().name()))
+                );
+
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+                SecurityContextHolder.getContext()
+                        .setAuthentication(authenticationToken);
+            }
+        } catch (ExpiredJwtException expiredJwtException) {
+            unauthorized(response, "TOKEN_EXPIRED");
+            return;
+        } catch (JwtException | IllegalArgumentException exception) {
+            unauthorized(response, "INVALID_TOKEN");
+            return;
         }
 
-        // loginUser 정보로 UsernamePasswordAuthenticationToken 발급
-        Member member = memberRepository.findByUserId(userEmail);
-        UsernamePasswordAuthenticationToken authToken =
-                new UsernamePasswordAuthenticationToken(member, null, List.of(new SimpleGrantedAuthority(member.getRole().name())));
-        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-        SecurityContextHolder.getContext().setAuthentication(authToken);
-        // 권한 부여
+        // 다음 필터 진행
         filterChain.doFilter(request, response);
+    }
 
+    private void unauthorized(
+            HttpServletResponse response,
+            String code
+    ) throws IOException {
+        SecurityContextHolder.clearContext();
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json;charset=UTF-8");
+        response.getWriter().write(
+                """
+                {"code":"%s"}
+                """.formatted(code)
+        );
     }
 }
